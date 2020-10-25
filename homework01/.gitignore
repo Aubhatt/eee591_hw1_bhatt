@@ -1,0 +1,16 @@
+
+*.xml
+depend.list
+genesis_clean.cmd
+phys_*
+csrc
+*.txt
+*.saif
+ucli.key
+genesis_synth
+genesis_verif
+genesis_work
+simv
+simv.*
+*~
+genesis_vlog*

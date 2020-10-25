@@ -1,0 +1,84 @@
+////////////////////////////////////////////////////////////////////////
+// top_RF8_4b_GL.vp
+//
+//; use strict ;
+//; use warnings FATAL=>qw(all);
+//; use diagnostics ;
+//; use POSIX qw(ceil log2) ;
+
+//; my $bW = 4 ;
+//; my $eC = 8 ; 
+//; my $aW = int(ceil(log2($eC))) ;
+
+module `mname`();
+
+
+   logic [`$aW-1`:0]  wrAddr;
+   logic [`$bW-1`:0]  wrVal;
+   logic              wrEn;
+   logic [`$aW-1`:0]  rdAddr;
+   logic [`$bW-1`:0]  rdVal, rdVal_g;
+  
+   logic [`$bW-1`:0] mem_g[`$eC-1`:0];
+   
+   logic 	     clk ;
+  
+   //// DUT ////
+//; my $gt = generate_base('RF8_4b_GL', 'my_RF8_4b_GL');
+   `$gt->instantiate` (.*);
+
+   //// GOLD ////
+   always @(posedge clk)
+     if(wrEn)
+       mem_g[wrAddr] <= wrVal;
+   assign rdVal_g = mem_g[rdAddr] ;
+   
+			
+   // A clock for sequencing
+   initial begin 
+      clk = 1'b0 ;
+      while(1) begin
+	 #500 clk = 1'b0 ;
+	 #500 clk = 1'b1 ;
+      end
+   end
+  
+   // How long should our test run 
+   initial begin
+      repeat(1024) @(posedge clk) begin end 
+      $finish(1) ; 
+   end
+
+   //Driver Model
+   always @(negedge clk) begin
+      wrAddr = $random();
+      wrVal  = $random();
+      wrEn   = $random();
+      rdAddr = $random();
+   end
+
+  //Test
+  always @(posedge clk) begin
+     #1 begin end
+     a0: assert( rdVal === rdVal_g ) ;
+  end
+
+  //Monitor
+  always @(posedge clk) begin
+     #1 begin end 
+     $write( "%8t : ",$time());
+     $write( " wA:%3b", wrAddr  );
+     $write( " wV:%4b", wrVal  );
+     $write( " wE:%b",  wrEn   );     
+     $write("\n");
+  end
+  always @* begin
+     $write( "%8t : ------------------------",$time());
+     $write( " rA:%3b", rdAddr  );
+     $write( " rV:%4b (%4b)",  rdVal, rdVal_g  );
+     $write("\n");
+  end
+   
+   
+endmodule
+  

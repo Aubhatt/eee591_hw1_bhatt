@@ -1,0 +1,57 @@
+////////////////////////////////////////////////////////////////////////
+// top_PRIENC8_GL.vp
+//
+//; use strict ;
+//; use warnings FATAL=>qw(all);
+//; use diagnostics ;
+
+module `mname`();
+
+  localparam int bW = 8 ;
+
+  logic [bW-1:0] A,Y;
+  logic clk ;
+  
+//; my $gt = generate_base('PRIENC8_GL', 'my_PRIENC8_GL');
+   `$gt->instantiate` (.*);
+
+  // A clock for sequencing
+  initial begin 
+    clk = 1'b0 ;
+    while(1) begin
+      #500 clk = 1'b0 ;
+      #500 clk = 1'b1 ;
+    end
+  end
+  
+  // How long should our test run 
+  initial begin
+    repeat(1024) @(posedge clk) ; 
+    $finish(1) ; 
+  end
+
+  //Driver Model
+  always @(negedge clk) begin
+     A = $random();
+  end
+
+  //Test
+  always @(posedge clk) begin
+     #1;
+     a0: assert( ! $isunknown(Y) ) ;
+     a1: assert( $onehot( Y&A ) || (A=='0 && Y=='0)); //Valid vote or Zero
+     a2: assert( Y > (A&(~Y))   || (A=='0 && Y=='0)); //most sig or zero 
+     a3: assert( Y <= A         ); // most sig
+  end
+
+  //Monitor
+  always @(posedge clk) begin
+     #1 ;
+     $write( " %b", A) ;
+     $write( " -->" );
+     $write( " %b", Y);
+     $write("\n");
+  end
+   
+endmodule
+  

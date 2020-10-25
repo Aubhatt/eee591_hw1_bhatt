@@ -1,0 +1,16 @@
+////////////////////////////////////////////////////////////////////////
+// PRIENC8_GL.vp  
+//;
+//; # Any Line that starts with a slash slash semi-colon is perl
+//; # So we can follow our good habits from before
+//; use strict ;                   # Use a strict interpretation
+//; use warnings FATAL=>qw(all);   # Turn warnings into errors
+//; use diagnostics ;              # Print helpful info, for errors
+//;
+
+module `mname`
+   #( parameter int bW=8 )
+   ( input  wire [bW-1:0] A,
+     output wire [bW-1:0] Y  );
+
+endmodule 

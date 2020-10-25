@@ -1,0 +1,112 @@
+/////////////////////////////////////////////////////////////////////////
+// top_SRLATCH_GL.vp
+//
+
+//; use strict ;
+//; use warnings FATAL=>qw(all);
+//; use diagnostics ;
+
+module `mname`();
+   
+   logic S, R, Q, Qb ;
+
+//; my $gt = generate_base('SRLATCH_GL', 'my_SRLATCH_GL');
+   `$gt->instantiate` (.*);
+        
+   initial begin
+      {S,R} = 2'b00 ;
+      #100 ;
+
+      // Check initial Reset
+      {S,R} = 2'b01 ;
+      #10 ;
+      a0: assert( {Q,Qb}===2'b01 );
+      #2 ;
+            
+      // Check Retention
+      {S,R} = 2'b00 ;
+      #10 ;
+      a1: assert( {Q,Qb}===2'b01 );
+      #2 ;
+     
+      // Check Set
+      {S,R} = 2'b10 ;
+      #10 ;
+      a2: assert( {Q,Qb}===2'b10 );
+      #2 ;
+      
+      // Check Retention
+      {S,R} = 2'b00 ;
+      #10 ;
+      a3: assert( {Q,Qb}===2'b10 );
+      #2 ;
+	
+       // Check Reset
+      {S,R} = 2'b01 ;
+      #10 ;
+      a33: assert( {Q,Qb}===2'b01 );
+      #2 ;
+            
+      // Check Retention
+      {S,R} = 2'b00 ;
+      #10 ;
+      a4: assert( {Q,Qb}===2'b01 );
+      #2 ;
+    
+      // Check Set
+      {S,R} = 2'b10 ;
+      #10 ;
+      a5: assert( {Q,Qb}===2'b10 );
+      #2 ;
+      
+      // Check Retention
+      {S,R} = 2'b00 ;
+      #10 ;
+      a6: assert( {Q,Qb}===2'b10 );
+      #2 ;
+
+      // Check Reset Glitch
+      {S,R} = 2'b01 ;
+      #2 ;
+      {S,R} = 2'b00 ;
+      #10 ;
+      a7: assert( {Q,Qb}===2'b10 );
+      #2 ;
+      
+       // Check Reset
+      {S,R} = 2'b01 ;
+      #10 ;
+      a8: assert( {Q,Qb}===2'b01 );
+      #2 ;
+            
+      // Check Retention
+      {S,R} = 2'b00 ;
+      #10 ;
+      a9: assert( {Q,Qb}===2'b01 );
+      #2 ;
+
+      // Check Set Glitch
+      {S,R} = 2'b10 ;
+      #2 ;
+      {S,R} = 2'b00 ;
+      #10 ;
+      a10: assert( {Q,Qb}===2'b01 );
+      #2 ;
+
+      // Check the 00 state
+      {S,R} = 2'b11 ;
+      #10 ;
+      a11: assert( {Q,Qb}===2'b00 );
+      #2 ;
+      
+      $finish();
+   end
+   
+   // Monito
+   always @* begin
+      $display("%4t %2b -> %2b",$time(),{S,R},{Q,Qb});
+   end
+
+endmodule 
+
+

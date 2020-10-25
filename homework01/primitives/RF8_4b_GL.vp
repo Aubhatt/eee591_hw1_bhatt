@@ -1,0 +1,26 @@
+////////////////////////////////////////////////////////////////////////
+// RF8_4b_GL.vp  
+//;
+//; # Any Line that starts with a slash slash semi-colon is perl
+//; # So we can follow our good habits from before
+//; use strict ;                   # Use a strict interpretation
+//; use warnings FATAL=>qw(all);   # Turn warnings into errors
+//; use diagnostics ;              # Print helpful info, for errors
+//; use POSIX qw(ceil log2) ;
+//;
+
+//; my $bW = 4 ;
+//; my $eC = 8 ; 
+//; my $aW = int(ceil(log2($eC))) ;
+
+module `mname`
+   (
+    input  wire [`$aW-1`:0]  wrAddr,
+    input  wire [`$bW-1`:0]  wrVal,
+    input  wire              wrEn,
+    input  wire [`$aW-1`:0]  rdAddr,
+    output wire [`$bW-1`:0]  rdVal,
+    input  wire              clk
+    );
+
+endmodule 

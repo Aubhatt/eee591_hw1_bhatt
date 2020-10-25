@@ -1,0 +1,79 @@
+////////////////////////////////////////////////////////////////////////
+// top_MUX8_4b_GL.vp
+//
+//; use strict ;
+//; use warnings FATAL=>qw(all);
+//; use diagnostics ;
+//; use POSIX qw(ceil log2) ;
+
+//; my $bW = 4 ;
+//; my $eC = 8 ; 
+//; my $aW = int(ceil(log2($eC))) ;
+
+module `mname`();
+
+   //; for( my $i = 0 ; $i < $eC ; $i++ ){
+   logic [`$bW-1`:0] A`$i`;   
+   //; }
+   logic [`$aW-1`:0] S;
+   logic [`$bW-1`:0] Y, Y_g ;
+
+   
+   logic 	     clk ;
+  
+   //// DUT ////
+//; my $gt = generate_base('MUX8_4b_GL', 'my_MUX8_4b_GL');
+   `$gt->instantiate` (.*);
+
+   //// GOLD ////
+   always_comb
+     unique case (S)
+     //; for( my $i = 0 ; $i < $eC ; $i++ ){
+       `$eC`'d`$i` : Y_g = A`$i` ;
+     //; }
+       default : Y_g = `$bW`'d0;
+     endcase
+    
+   // A clock for sequencing
+   initial begin 
+      clk = 1'b0 ;
+      while(1) begin
+	 #500 clk = 1'b0 ;
+	 #500 clk = 1'b1 ;
+      end
+   end
+  
+   // How long should our test run 
+   initial begin
+      repeat(1024) @(posedge clk) begin end 
+      $finish(1) ; 
+   end
+
+   //Driver Model
+   always @(negedge clk) begin
+   //; for( my $i = 0 ; $i < $eC ; $i++ ){
+      A`$i` = $random();
+   //; }
+      S = $random();
+   end
+
+  //Test
+  always @(posedge clk) begin
+     #1 begin end
+     a0: assert( Y===Y_g ) ;
+  end
+
+  //Monitor
+  always @* begin
+     $write( "%8t : _",$time());
+   //; for( my $i = $eC-1 ; $i >= 0 ; $i-- ){
+     $write( "%`$bW`b_", A`$i`) ;
+   //; }
+     $write( " s:%`$eC`b", S) ;
+     $write( " -->" );
+     $write( " %`$bW`b (%`$bW`b)", Y, Y_g);
+     $write("\n");
+  end
+   
+endmodule
+  

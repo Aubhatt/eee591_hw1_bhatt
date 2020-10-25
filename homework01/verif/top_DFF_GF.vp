@@ -1,0 +1,110 @@
+/////////////////////////////////////////////////////////////////////////
+// top_DFF_GL.vp
+//
+
+//; use strict ;
+//; use warnings FATAL=>qw(all);
+//; use diagnostics ;
+
+module `mname`();
+   
+   logic D, Q, CK, Q_G ;
+
+   localparam int ht=20;
+   localparam int st=20;
+   localparam int cq=20;
+   localparam int Tpw=500;
+
+   // gold model
+   always @( posedge CK )
+     Q_G <= D;
+   
+   
+//; my $gt = generate_base('DFF_GL', 'my_DFF_GL');
+   `$gt->instantiate` (.*);
+        
+   initial begin
+      {D,CK} = 2'b00 ;
+      #100 ;
+
+      // Check Rising Edge D=0
+      {D,CK} = 2'b01 ;
+      #19 ;
+      a0: assert( Q === 1'b0 );
+      #2 ;
+      // Check Falling Edge Retain
+      {D,CK} = 2'b00 ;
+      #19 ;
+      a1: assert( Q === 1'b0 );
+      #2 ;
+      // Check Rising Edge D=1
+      {D,CK} = 2'b10 ;
+      #19 ;
+      {D,CK} = 2'b11 ;
+      #19 ;      
+      a2: assert( Q === 1'b1 );
+      #2 ;
+      // Check Falling Edge Retain
+      {D,CK} = 2'b11 ;
+      #19 ;
+      a3: assert( Q === 1'b1 );
+      #2 ;
+      #100 ;
+
+      // Check Random Patterns of 1/0 
+      for( int i=0 ; i < 100 ; i++ ) begin
+	 CK = 1'b0 ;
+	 D = $random();	 
+	 #Tpw ;	 
+	 CK = 1'b1 ;	  
+	 #Tpw ;
+	 a5: assert( Q === Q_G );	 
+      end
+
+      #100 ;
+      // Check D=1 Corruption
+      {D,CK} = 2'b10 ;
+      #25 ;
+      {D,CK} = 2'b11 ;
+      #25 ;
+      {D,CK} = 2'b10 ;
+      #25 ;
+      force   Q = 1'b0 ;
+      #25 ;
+      release Q ;
+      #25 ;
+      a6: assert( Q === 1'b1 );
+      #2 ;
+
+      // Check D=0 Corruption
+      {D,CK} = 2'b00 ;
+      #25 ;
+      {D,CK} = 2'b01 ;
+      #25 ;
+      {D,CK} = 2'b00 ;
+      #25 ;
+      force   Q = 1'b1 ;
+      #25 ;
+      release Q ;
+      #25 ;
+      a7: assert( Q === 1'b0 );
+      #2 ;
+     
+      
+      // Hold time check
+      //// (perform sweep to find the hold time)
+      
+      // Setup time check
+      //// (perform sweep to find the setup time)
+      
+      $finish();
+   end
+   
+   // Monito
+   always @* begin
+      $display("%6t %2b -> %b",$time(),{D,CK},Q);
+   end
+
+endmodule 
+
+
